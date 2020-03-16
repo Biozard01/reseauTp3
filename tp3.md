@@ -185,19 +185,19 @@ public (active)
 
 ```bash
 [arthur@client1 ~]$ hostname --fqdn
-client1.net1.tp3
+client1.net1
 [arthur@client1 ~]$
 ```
 
 ```bash
 [arthur@server1 ~]$ hostname --fqdn
-server1.net2.tp3
+server1
 [arthur@server1 ~]$
 ```
 
 ```bash
 [arthur@router ~]$ hostname --fqdn
-router.tp3
+router
 [arthur@router ~]$
 ```
 
@@ -451,4 +451,268 @@ rtt min/avg/max/mdev = 1.326/1.560/1.795/0.237 ms
 10.3.1.1 dev enp0s8 lladdr 0a:00:27:00:00:14 DELAY
 10.3.2.11 dev enp0s9 lladdr 08:00:27:a9:d7:07 REACHABLE
 [arthur@router ~]$
+```
+
+##### TCPDUMP 1
+
+```bash
+[arthur@client1 ~]$ sudo ip neigh flush all
+```
+
+```bash
+[arthur@router ~]$ sudo ip neigh flush all
+```
+
+```bash
+[arthur@client1 ~]$ ping server1
+PING server1 (10.3.2.11) 56(84) bytes of data.
+64 bytes from server1 (10.3.2.11): icmp_seq=1 ttl=63 time=1.10 ms
+64 bytes from server1 (10.3.2.11): icmp_seq=2 ttl=63 time=0.620 ms
+^C
+--- server1 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 0.620/0.863/1.107/0.245 ms
+```
+
+##### TCPDUMP 2
+
+```bash
+[arthur@router ~]\$ sudo ip neigh flush all
+```
+
+```bash
+[arthur@client1 ~]\$ sudo ip neigh flush all
+```
+
+```bash
+[arthur@server1 ~]\$ sudo ip neigh flush all
+```
+
+```bash
+[arthur@client1 ~]\$ ping server1
+PING server1 (10.3.2.11) 56(84) bytes of data.
+64 bytes from server1 (10.3.2.11): icmp_seq=1 ttl=63 time=1.20 ms
+64 bytes from server1 (10.3.2.11): icmp_seq=2 ttl=63 time=0.626 ms
+^C
+--- server1 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 0.626/0.914/1.203/0.290 ms
+```
+
+### Entracte : Donner un accès internet aux VM
+
+```bash
+[arthur@router ~]$ sudo firewall-cmd --add-masquerade --permanent
+success
+```
+
+```bash
+[arthur@router ~]$ sudo firewall-cmd --reload
+success
+```
+
+```bash
+[arthur@client1 ~]$ ping 8.8.8.8
+PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
+64 bytes from 8.8.8.8: icmp_seq=1 ttl=53 time=38.3 ms
+64 bytes from 8.8.8.8: icmp_seq=2 ttl=53 time=33.1 ms
+^C
+--- 8.8.8.8 ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1002ms
+rtt min/avg/max/mdev = 33.123/35.730/38.338/2.614 ms
+```
+
+```bash
+[arthur@client1 ~]\$ dig ynov.com
+
+; <<>> DiG 9.11.4-P2-RedHat-9.11.4-9.P2.el7 <<>> ynov.com
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 50746
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 1
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 1452
+;; QUESTION SECTION:
+;ynov.com. IN A
+
+;; ANSWER SECTION:
+ynov.com. 10800 IN A 217.70.184.38
+
+;; Query time: 70 msec
+;; SERVER: 1.1.1.1#53(1.1.1.1)
+;; WHEN: Sun Mar 15 17:28:17 CET 2020
+;; MSG SIZE rcvd: 53
+```
+
+```bash
+[arthur@client1 ~]\$ sudo yum install -y epel-release
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+
+- base: centos.crazyfrogs.org
+- extras: ftp.pasteur.fr
+- updates: mirror.in2p3.fr
+  Resolving Dependencies
+  --> Running transaction check
+  ---> Package epel-release.noarch 0:7-11 will be installed
+  --> Finished Dependency Resolution
+
+Dependencies Resolved
+
+========================================================================================================================
+Package Arch Version Repository Size
+========================================================================================================================
+Installing:
+epel-release noarch 7-11 extras 15 k
+
+# Transaction Summary
+
+Install 1 Package
+
+Total download size: 15 k
+Installed size: 24 k
+Downloading packages:
+epel-release-7-11.noarch.rpm | 15 kB 00:00:00
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+Installing : epel-release-7-11.noarch 1/1
+Verifying : epel-release-7-11.noarch 1/1
+
+Installed:
+epel-release.noarch 0:7-11
+
+Complete!
+```
+
+```bash
+[arthur@client1 ~]\$ sudo yum install -y sl
+Loaded plugins: fastestmirror
+Loading mirror speeds from cached hostfile
+epel/x86_64/metalink | 19 kB 00:00:00
+
+- base: centos.crazyfrogs.org
+- epel: fr2.rpmfind.net
+- extras: ftp.pasteur.fr
+- updates: mirror.in2p3.fr
+  epel | 5.3 kB 00:00:00
+  (1/3): epel/x86_64/group_gz | 95 kB 00:00:00
+  (2/3): epel/x86_64/updateinfo | 1.0 MB 00:00:02
+  (3/3): epel/x86_64/primary_db | 6.7 MB 00:00:08
+  Resolving Dependencies
+  --> Running transaction check
+  ---> Package sl.x86_64 0:5.02-1.el7 will be installed
+  --> Finished Dependency Resolution
+
+Dependencies Resolved
+
+========================================================================================================================
+Package Arch Version Repository Size
+========================================================================================================================
+Installing:
+sl x86_64 5.02-1.el7 epel 14 k
+
+# Transaction Summary
+
+Install 1 Package
+
+Total download size: 14 k
+Installed size: 17 k
+Downloading packages:
+warning: /var/cache/yum/x86_64/7/epel/packages/sl-5.02-1.el7.x86_64.rpm: Header V3 RSA/SHA256 Signature, key ID 352c64e5: NOKEY
+Public key for sl-5.02-1.el7.x86_64.rpm is not installed
+sl-5.02-1.el7.x86_64.rpm | 14 kB 00:00:00
+Retrieving key from file:///etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+Importing GPG key 0x352C64E5:
+Userid : "Fedora EPEL (7) <epel@fedoraproject.org>"
+Fingerprint: 91e9 7d7c 4a5e 96f1 7f3e 888f 6a2f aea2 352c 64e5
+Package : epel-release-7-11.noarch (@extras)
+From : /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-7
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+Installing : sl-5.02-1.el7.x86_64 1/1
+Verifying : sl-5.02-1.el7.x86_64 1/1
+
+Installed:
+sl.x86_64 0:5.02-1.el7
+
+Complete!
+```
+
+```bash
+[arthur@client1 ~]\$ sl
+```
+
+### III. Plus de tcpdump
+
+#### 1. TCP et UDP
+
+##### A. Warm-up
+
+```bash
+[arthur@client1 ~]$ sudo firewall-cmd --add-port=9999/tcp --permanent
+success
+```
+
+```bash
+[arthur@client1 ~]$ sudo firewall-cmd --add-port=9999/udp --permanent
+success
+```
+
+```bash
+[arthur@server1 ~]$ sudo firewall-cmd --add-port=9999/tcp --permanent
+success.
+```
+
+```bash
+[arthur@server1 ~]$ sudo firewall-cmd --add-port=9999/udp --permanent
+success
+```
+
+##### B. Analyse de trames
+
+##### TCP
+
+```bash
+[arthur@client1 ~]$ nc server1 9999
+yes
+sa marche
+^C
+```
+
+```bash
+[arthur@server1 ~]$ nc -l -p 9999
+yes
+sa marche
+^C
+```
+
+##### UDP
+
+```bash
+[arthur@client1 ~]$ nc -u server1 9999
+dans l'autre sense
+je te la met a l'envers
+^C
+```
+
+```bash
+[arthur@server1 ~]$ nc -u -l -p 9999
+dans l'autre sense
+je te la met a l'envers
+wait la co n'est plus là
+^C
+```
+
+#### 2. SSH
+
+```bash
+[arthur@client1 ~]$ ssh arthur@10.3.2.11 -p 7777
+arthur@10.3.2.11's password:
+Last login: Mon Mar 16 10:43:15 2020 from 10.3.2.1
+Last login: Mon Mar 16 15:05:16 2020 from 10.3.2.1
 ```
